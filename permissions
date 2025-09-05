@@ -1,0 +1,19 @@
+PROJECT_ID="thermal-antenna-469417-r6"
+REGION="us-central1"
+JENKINS_SA="sa-jks-deployments@${PROJECT_ID}.iam.gserviceaccount.com"
+
+# Puede ejecutar gcloud builds submit
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${JENKINS_SA}" \
+  --role="roles/cloudbuild.builds.editor"
+
+# Ya que despliegas Cloud Run desde Jenkins
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${JENKINS_SA}" \
+  --role="roles/run.admin"
+
+# (Opcional) si el pipeline crea el repositorio de Artifact Registry
+# deja esta línea; si lo vas a crear una vez a mano, no hace falta.
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${JENKINS_SA}" \
+  --role="roles/artifactregistry.admin"
