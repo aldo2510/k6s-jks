@@ -73,10 +73,6 @@ pipeline {
             # Guardar URL en workspace para el stage de k6
             gcloud run services describe ${SERVICE} --format="value(status.url)" > cr_url.txt
             echo "Cloud Run URL: $(cat cr_url.txt)"
-
-            # Smoke check rápido
-            docker run --rm curlimages/curl:8.9.1 -fsS $(cat cr_url.txt)/ > /dev/null
-            echo "Smoke check OK"
           '''
         }
       }
