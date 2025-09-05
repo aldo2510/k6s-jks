@@ -1,14 +1,10 @@
 pipeline {
   agent none
-  options {
-    timestamps()
-    ansiColor('xterm')
-  }
 
   environment {
-    PROJECT_ID = '<TU_PROJECT_ID>'              // ej: my-gcp-project
-    REGION     = '<TU_REGION>'                  // ej: us-central1
-    REPO       = 'lab25'                        // Artifact Registry repo
+    PROJECT_ID = 'thermal-antenna-469417-r6'              // ej: my-gcp-project
+    REGION     = 'us-central1'                  // ej: us-central1
+    REPO       = 'cloud-jenkins-registry'                        // Artifact Registry repo
     IMAGE      = "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/lab25-api:latest"
     SERVICE    = 'lab25-api'
   }
@@ -26,12 +22,11 @@ pipeline {
       agent {
         docker {
           image 'google/cloud-sdk:slim'
-          // Monta el config local de gcloud si lo usas; no es obligatorio
           args '-v $HOME/.config/gcloud:/root/.config/gcloud'
         }
       }
       steps {
-        withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GC_KEY')]) {
+        withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GC_KEY')]) {
           sh '''
             set -e
             gcloud auth activate-service-account --key-file="${GC_KEY}"
@@ -59,7 +54,7 @@ pipeline {
         }
       }
       steps {
-        withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GC_KEY')]) {
+        withCredentials([file(credentialsId: 'gcloud-creds', variable: 'GC_KEY')]) {
           sh '''
             set -e
             gcloud auth activate-service-account --key-file="${GC_KEY}"
