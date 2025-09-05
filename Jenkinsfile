@@ -87,18 +87,20 @@ pipeline {
       agent {
         docker {
           image 'grafana/k6:latest'
-          // IMPORTANTE: anular entrypoint para que Jenkins pueda hacer 'cat'
-          args '--entrypoint="" -v $WORKSPACE/tests:/tests:ro -v $WORKSPACE/k6:/out'
+          // Necesario para que el plugin no intente ejecutar "k6 cat"
+          args "--entrypoint=''"
         }
       }
       steps {
         sh '''
-          set -e
+          set -euo pipefail
           URL=$(cat cr_url.txt)
           echo "TARGET=$URL"
-          mkdir -p /out
-          # Pasamos TARGET al script de k6
-          k6 run -e TARGET=$URL /tests/load-test.js --summary-export=/out/summary.json | tee /out/out.txt
+    
+          # Usamos el workspace que Jenkins ya montó como working dir
+          mkdir -p k6
+          k6 run -e TARGET="$URL" tests/load-test.js \
+            --summary-export=k6/summary.json | tee k6/out.txt
         '''
       }
       post {
@@ -107,6 +109,7 @@ pipeline {
         }
       }
     }
+
 
   }
 }
