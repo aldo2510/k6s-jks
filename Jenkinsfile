@@ -66,9 +66,9 @@ pipeline {
               --image ${IMAGE} \
               --allow-unauthenticated \
               --port 8080 \
-              --cpu 1 --memory 512Mi \
+              --cpu 2 --memory 2048Mi \
               --concurrency 80 \
-              --min-instances 0 --max-instances 10
+              --min-instances 2 --max-instances 20
 
             # Guardar URL en workspace para el stage de k6
             gcloud run services describe ${SERVICE} --format="value(status.url)" > cr_url.txt
